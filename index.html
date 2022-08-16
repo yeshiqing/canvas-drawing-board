@@ -14,32 +14,47 @@
     <canvas id="canvas"></canvas>
 
     <script type="text/javascript">
-        var canvas = document.getElementById("canvas")
+        let canvas = document.getElementById("canvas")
         // canvas 宽高设置为文档的高度
         canvas.width = document.documentElement.clientWidth
         canvas.height = document.documentElement.clientHeight
 
-        // 画线
-        var ctx = canvas.getContext("2d")
+        let ctx = canvas.getContext("2d")
 
+        ctx.fillStyle = "black"//填充颜色
+        ctx.strokeStyle = 'none'//描边颜色
+        ctx.lineWidth = 10
+        ctx.lineCap = 'round'
         let isPainting = false;
-        ctx.fillStyle = "black"
-        ctx.strokeStyle = 'none'
+        let last
 
-        canvas.onmousedown = () => {
+
+        canvas.onmousedown = (e) => {
             isPainting = true;
-            //画点
+            last = {
+                x: e.clientX,
+                y: e.clientY
+            }
+
         }
         canvas.onmousemove = (e) => {
             if (isPainting === true) {
-                ctx.beginPath()
-                ctx.arc(e.clientX, e.clientY, 6, 0, 2 * Math.PI)
-                ctx.stroke()
-                ctx.fill()
+                drawLine(last.x, last.y, e.clientX, e.clientY)
+                last = {
+                    x: e.clientX,
+                    y: e.clientY
+                }
             }
         }
         canvas.onmouseup = () => {
             isPainting = false;
+        }
+
+        function drawLine(x1, y1, x2, y2) {
+            ctx.beginPath()
+            ctx.moveTo(x1, y1)
+            ctx.lineTo(x2, y2)
+            ctx.stroke()
         }
     </script>
 </body>
