@@ -11,9 +11,14 @@
 </head>
 
 <body>
+    <div class="tips js_tips">
+        <p>这是一个简易画板，
+            你可以在这里画线。</p>
+    </div>
     <canvas id="canvas"></canvas>
 
     <script type="text/javascript">
+        var tipEle = document.querySelector('.js_tips')
         let canvas = document.getElementById("canvas")
         // canvas 宽高设置为文档的高度
         canvas.width = document.documentElement.clientWidth
@@ -35,11 +40,7 @@
                 paintBegin(e)
             }
             canvas.ontouchmove = (e) => {
-                let x = e.touches[0].clientX
-                let y = e.touches[0].clientY
-                ctx.beginPath()
-                ctx.arc(x, y, lineWidth / 2, 0, 2 * Math.PI)
-                ctx.fill()
+                paint(e.touches[0])
                 // 手机屏书写时屏幕会上下左右微移动，不稳定
             }
         } else {
@@ -47,19 +48,27 @@
                 paintBegin(e)
             }
             canvas.onmousemove = (e) => {
-                if (isPainting === true) {
-                    drawLine(last.x, last.y, e.clientX, e.clientY)
-                    last = {
-                        x: e.clientX,
-                        y: e.clientY
-                    }
-                }
+                paint(e)
             }
             canvas.onmouseup = () => {
                 isPainting = false;
             }
         }
+        function paint(e) {
+            if (isPainting === true) {
+                drawLine(last.x, last.y, e.clientX, e.clientY)
+                last = {
+                    x: e.clientX,
+                    y: e.clientY
+                }
+            }
+        }
         function paintBegin(e) {
+            if (tipEle) {
+                tipEle.parentNode.removeChild(tipEle)
+                tipEle = null
+            }
+
             isPainting = true;
             drawDot(e.clientX, e.clientY)
             last = {

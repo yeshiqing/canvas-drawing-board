@@ -9,3 +9,19 @@
     width: 100vw;
     display: block;
 }
+
+body {
+    /* 解决在手机上页面会滚动的 bug */
+    overflow: hidden;
+}
+
+.tips {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 10em;
+    margin-left: -5em;
+    margin-top: -1em;
+    color: #444;
+    text-align: center;
+}
