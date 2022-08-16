@@ -20,41 +20,63 @@
         canvas.height = document.documentElement.clientHeight
 
         let ctx = canvas.getContext("2d")
+        let lineWidth = 10
 
         ctx.fillStyle = "black"//填充颜色
         ctx.strokeStyle = 'none'//描边颜色
-        ctx.lineWidth = 10
+        ctx.lineWidth = lineWidth
         ctx.lineCap = 'round'
         let isPainting = false;
         let last
 
-
-        canvas.onmousedown = (e) => {
+        var isTouchDevice = 'ontouchstart' in document.documentElement
+        if (isTouchDevice) {
+            canvas.ontouchstart = (e) => {
+                paintBegin(e)
+            }
+            canvas.ontouchmove = (e) => {
+                let x = e.touches[0].clientX
+                let y = e.touches[0].clientY
+                ctx.beginPath()
+                ctx.arc(x, y, lineWidth / 2, 0, 2 * Math.PI)
+                ctx.fill()
+                // 手机屏书写时屏幕会上下左右微移动，不稳定
+            }
+        } else {
+            canvas.onmousedown = (e) => {
+                paintBegin(e)
+            }
+            canvas.onmousemove = (e) => {
+                if (isPainting === true) {
+                    drawLine(last.x, last.y, e.clientX, e.clientY)
+                    last = {
+                        x: e.clientX,
+                        y: e.clientY
+                    }
+                }
+            }
+            canvas.onmouseup = () => {
+                isPainting = false;
+            }
+        }
+        function paintBegin(e) {
             isPainting = true;
+            drawDot(e.clientX, e.clientY)
             last = {
                 x: e.clientX,
                 y: e.clientY
             }
-
         }
-        canvas.onmousemove = (e) => {
-            if (isPainting === true) {
-                drawLine(last.x, last.y, e.clientX, e.clientY)
-                last = {
-                    x: e.clientX,
-                    y: e.clientY
-                }
-            }
-        }
-        canvas.onmouseup = () => {
-            isPainting = false;
-        }
-
         function drawLine(x1, y1, x2, y2) {
             ctx.beginPath()
             ctx.moveTo(x1, y1)
             ctx.lineTo(x2, y2)
             ctx.stroke()
+        }
+        function drawDot(x, y) {
+            ctx.beginPath() // 每次画点必须重新 beginPath，否则画第2个点之后的点，fill会使得他们连成多边形。
+            ctx.arc(x, y, lineWidth / 2, 0, 2 * Math.PI)
+            ctx.fill() //不能用 stroke，否则受 lineWidth 属性影响外围会粗一圈。
         }
     </script>
 </body>
